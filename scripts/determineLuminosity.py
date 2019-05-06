@@ -326,6 +326,7 @@ def lumiDetermination(scen):
             last_state += 1
 
     if state == 2:
+        # if we want to override the IP position, we don't have to read the json file
         if scen.force_IP_position:
             print('setting interaction point to {0,0,0}')
             scen.rec_ip_info['ip_offset_x'] = 0  # in cm
@@ -435,7 +436,7 @@ parser.add_argument('--num_samples', metavar='num_samples',
                     help='number of dpm data files to reconstruct (-1 means all)')
 parser.add_argument('--use_devel_queue', action='store_true',
                     help='If flag is set, the devel queue is used')
-parser.add_argument('--force_IP_position', metavar='force_IP_position', type=bool)
+parser.add_argument('--force_IP_position', metavar='force_IP_position', type=bool, help='force the IP to be at position {0,0,0}')
 
 args = parser.parse_args()
 
