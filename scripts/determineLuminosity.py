@@ -35,6 +35,7 @@ class Scenario:
         self.simulation_info_lists = []
 
         self.is_broken = False
+        self.force_IP_position = False
 
 
 def wasSimulationSuccessful(directory, glob_pattern):
@@ -325,35 +326,41 @@ def lumiDetermination(scen):
             last_state += 1
 
     if state == 2:
-        # check if ip was already determined
-        temp_dir_searcher = general.DirectorySearcher(
-            ['merge_data', 'binning_300'])
-        temp_dir_searcher.searchListOfDirectories(dir_path, 'reco_ip.json')
-        found_dirs = temp_dir_searcher.getListOfDirectories()
-        if not found_dirs:
-            # 2. determine offset on the vertex data sample
-            os.chdir(lmd_fit_bin_path)
+        if scen.force_IP_position:
+            print('setting interaction point to {0,0,0}')
+            scen.rec_ip_info['ip_offset_x'] = 0  # in cm
+            scen.rec_ip_info['ip_offset_y'] = 0
+            scen.rec_ip_info['ip_offset_z'] = 0        
+        else:
+            # check if ip was already determined
             temp_dir_searcher = general.DirectorySearcher(
                 ['merge_data', 'binning_300'])
-            temp_dir_searcher.searchListOfDirectories(
-                dir_path, ['lmd_vertex_data_', 'of1.root'])
+            temp_dir_searcher.searchListOfDirectories(dir_path, 'reco_ip.json')
             found_dirs = temp_dir_searcher.getListOfDirectories()
-            bashcommand = './determineBeamOffset -p ' + \
-                found_dirs[0] + ' -c ' + '../../vertex_fitconfig.json'
-            returnvalue = subprocess.call(bashcommand.split())
-            ip_rec_file = found_dirs[0] + '/reco_ip.json'
-        else:
-            ip_rec_file = found_dirs[0] + '/reco_ip.json'
+            if not found_dirs:
+                # 2. determine offset on the vertex data sample
+                os.chdir(lmd_fit_bin_path)
+                temp_dir_searcher = general.DirectorySearcher(
+                    ['merge_data', 'binning_300'])
+                temp_dir_searcher.searchListOfDirectories(
+                    dir_path, ['lmd_vertex_data_', 'of1.root'])
+                found_dirs = temp_dir_searcher.getListOfDirectories()
+                bashcommand = './determineBeamOffset -p ' + \
+                    found_dirs[0] + ' -c ' + '../../vertex_fitconfig.json'
+                returnvalue = subprocess.call(bashcommand.split())
+                ip_rec_file = found_dirs[0] + '/reco_ip.json'
+            else:
+                ip_rec_file = found_dirs[0] + '/reco_ip.json'
 
-        file_content = open(ip_rec_file)
-        ip_rec_data = json.load(file_content)
+            file_content = open(ip_rec_file)
+            ip_rec_data = json.load(file_content)
 
-        scen.rec_ip_info['ip_offset_x'] = float('{0:.3f}'.format(
-            round(float(ip_rec_data["ip_x"]), 3)))  # in cm
-        scen.rec_ip_info['ip_offset_y'] = float(
-            '{0:.3f}'.format(round(float(ip_rec_data["ip_y"]), 3)))
-        scen.rec_ip_info['ip_offset_z'] = float(
-            '{0:.3f}'.format(round(float(ip_rec_data["ip_z"]), 3)))
+            scen.rec_ip_info['ip_offset_x'] = float('{0:.3f}'.format(
+                round(float(ip_rec_data["ip_x"]), 3)))  # in cm
+            scen.rec_ip_info['ip_offset_y'] = float(
+                '{0:.3f}'.format(round(float(ip_rec_data["ip_y"]), 3)))
+            scen.rec_ip_info['ip_offset_z'] = float(
+                '{0:.3f}'.format(round(float(ip_rec_data["ip_z"]), 3)))
 
         state += 1
         last_state += 1
@@ -428,6 +435,7 @@ parser.add_argument('--num_samples', metavar='num_samples',
                     help='number of dpm data files to reconstruct (-1 means all)')
 parser.add_argument('--use_devel_queue', action='store_true',
                     help='If flag is set, the devel queue is used')
+parser.add_argument('--force_IP_position', metavar='force_IP_position', type=bool)
 
 args = parser.parse_args()
 
@@ -451,6 +459,7 @@ print(dirs)
 # at first assign each scenario the first step and push on the active stack
 for dir in dirs:
     scen = Scenario(dir)
+    scen.force_IP_position = args.force_IP_position
     active_scenario_stack.append(scen)
 
 
