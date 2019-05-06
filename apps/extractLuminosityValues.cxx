@@ -74,6 +74,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
     if (scenario.second.getFitResults().size() > 0
         && scenario.second.getSelectorSet().size() == 0) {
       PndLmdLumiFitResult fit_result;
+      std::cout << "step 5\n";
       for (auto const& fit_res_pair : scenario.second.getFitResults()) {
         if (fit_res_pair.second.size() > 0) {
           bool div_smeared = fit_res_pair.first.getModelOptionsPropertyTree().get<bool>(
@@ -88,7 +89,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
           }
         }
       }
-
+      std::cout << "step 6\n";
       // try to open ip measurement file... this is quite dirty but no time to do it nice...
       boost::property_tree::ptree lumi_values;
 
@@ -100,6 +101,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
       lumi_values.put("relative_deviation_in_percent", lumi.first);
       lumi_values.put("relative_deviation_error_in_percent", lumi.second);
 
+      std::cout << "step 7\n";
       std::stringstream filename;
       filename << boost::filesystem::path(scenario.first).parent_path().string();
 
@@ -113,6 +115,9 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
 
       filename << "/lumi-values.json";
       write_json(filename.str(), lumi_values);
+    }
+    else{
+      cout << "No fit results in scenario.\n";
     }
   }
 }
