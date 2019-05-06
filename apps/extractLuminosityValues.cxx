@@ -117,7 +117,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
       write_json(filename.str(), lumi_values);
     }
     else{
-      cout << "No fit results in scenario.\n";
+      std::cout << "No fit results in scenario.\n";
     }
   }
 }
