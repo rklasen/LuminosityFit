@@ -33,7 +33,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
     for (auto file_path : file_paths) {
       std::string fullpath = file_path;
       TFile fdata(fullpath.c_str(), "READ");
-
+      std::cout << "Testing...\n";
       // read in data from a root file which will return a map of PndLmdAngularData objects
       all_data[file_path] = lmd_data_facade.getDataFromFile<PndLmdFitDataBundle>(fdata);
     }
