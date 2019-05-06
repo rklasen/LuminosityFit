@@ -39,9 +39,11 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
     }
   }
 
+  std::cout << "step 1\n";
   // now get only the reco data bundle that are full phi
   std::map<std::string, PndLmdElasticDataBundle> full_phi_reco_data_vec;
 
+  std::cout << "step 2\n";
   LumiFit::LmdDimensionOptions phi_slice_dim_opt;
   phi_slice_dim_opt.dimension_type = LumiFit::PHI;
   phi_slice_dim_opt.track_param_type = LumiFit::LMD;
@@ -53,6 +55,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
   LumiFit::Comparisons::NegatedSelectionDimensionFilter filter(phi_slice_dim_opt);
   LumiFit::Comparisons::DataPrimaryDimensionOptionsFilter dim_filter(lmd_dim_opt);
 
+  std::cout << "step 3\n";
   for (auto const& datavec : all_data) {
     for (auto const& x : datavec.second) {
       std::vector<PndLmdElasticDataBundle> temp_full_phi_vec = lmd_data_facade.filterData(
@@ -65,6 +68,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
     }
   }
 
+  std::cout << "step 4\n";
   LumiFit::PndLmdPlotter lmd_plotter;
   for (auto const &scenario : full_phi_reco_data_vec) {
     if (scenario.second.getFitResults().size() > 0
