@@ -70,6 +70,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
 
   std::cout << "step 4\n";
   LumiFit::PndLmdPlotter lmd_plotter;
+  std::cout << "Size of full_phi_reco_data_vec:" << full_phi_reco_data_vec.size() << "\n"; 
   for (auto const &scenario : full_phi_reco_data_vec) {
     if (scenario.second.getFitResults().size() > 0
         && scenario.second.getSelectorSet().size() == 0) {
