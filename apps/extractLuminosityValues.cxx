@@ -66,7 +66,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
 
   LumiFit::PndLmdPlotter lmd_plotter;
   if(full_phi_reco_data_vec.size() < 1){
-    cout << "No full phi reco data found. Exiting.\n";
+    std::cout << "No full phi reco data found. Exiting.\n";
   } 
   for (auto const &scenario : full_phi_reco_data_vec) {
     if (scenario.second.getFitResults().size() > 0
