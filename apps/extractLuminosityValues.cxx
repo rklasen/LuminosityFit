@@ -20,7 +20,7 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
 
   PndLmdDataFacade lmd_data_facade;
 
-  // get all data first
+  // get all data firstl
   std::map<std::string, std::vector<PndLmdFitDataBundle> > all_data;
 
   std::vector<std::string> ip_files;
@@ -33,17 +33,14 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
     for (auto file_path : file_paths) {
       std::string fullpath = file_path;
       TFile fdata(fullpath.c_str(), "READ");
-      std::cout << "Testing...\n";
       // read in data from a root file which will return a map of PndLmdAngularData objects
       all_data[file_path] = lmd_data_facade.getDataFromFile<PndLmdFitDataBundle>(fdata);
     }
   }
 
-  std::cout << "step 1\n";
   // now get only the reco data bundle that are full phi
   std::map<std::string, PndLmdElasticDataBundle> full_phi_reco_data_vec;
 
-  std::cout << "step 2\n";
   LumiFit::LmdDimensionOptions phi_slice_dim_opt;
   phi_slice_dim_opt.dimension_type = LumiFit::PHI;
   phi_slice_dim_opt.track_param_type = LumiFit::LMD;
@@ -55,7 +52,6 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
   LumiFit::Comparisons::NegatedSelectionDimensionFilter filter(phi_slice_dim_opt);
   LumiFit::Comparisons::DataPrimaryDimensionOptionsFilter dim_filter(lmd_dim_opt);
 
-  std::cout << "step 3\n";
   for (auto const& datavec : all_data) {
     for (auto const& x : datavec.second) {
       std::vector<PndLmdElasticDataBundle> temp_full_phi_vec = lmd_data_facade.filterData(
@@ -68,14 +64,14 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
     }
   }
 
-  std::cout << "step 4\n";
   LumiFit::PndLmdPlotter lmd_plotter;
-  std::cout << "Size of full_phi_reco_data_vec:" << full_phi_reco_data_vec.size() << "\n"; 
+  if(full_phi_reco_data_vec.size() < 1){
+    cout << "No full phi reco data found. Exiting.\n";
+  } 
   for (auto const &scenario : full_phi_reco_data_vec) {
     if (scenario.second.getFitResults().size() > 0
         && scenario.second.getSelectorSet().size() == 0) {
       PndLmdLumiFitResult fit_result;
-      std::cout << "step 5\n";
       for (auto const& fit_res_pair : scenario.second.getFitResults()) {
         if (fit_res_pair.second.size() > 0) {
           bool div_smeared = fit_res_pair.first.getModelOptionsPropertyTree().get<bool>(
@@ -90,7 +86,6 @@ void extractLuminosityResults(std::vector<std::string> paths, const std::string 
           }
         }
       }
-      std::cout << "step 6\n";
       // try to open ip measurement file... this is quite dirty but no time to do it nice...
       boost::property_tree::ptree lumi_values;
 
